@@ -1106,8 +1106,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
         </div>
         <div class="chips-row" id="chips-children" role="group" aria-label="Most copied filters" hidden>
           <button class="chip chip--icon" type="button" id="chips-clear" aria-label="Clear filter"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJpY29uIC8gaW50ZXJmYWNlIC8gY2xvc2UiPgo8ZyBpZD0idmVjdG9yIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMS43NzEyIDEwLjgyODRMOC45NDI4MSA4TDExLjc3MTIgNS4xNzE1N0MxMi4wMzE5IDQuOTEwODkgMTIuMDMxNSA0LjQ4ODk4IDExLjc3MTIgNC4yMjg3NkMxMS41MTEgMy45Njg1NSAxMS4wODkxIDMuOTY4MDggMTAuODI4NCA0LjIyODc2TDggNy4wNTcxOUw1LjE3MTU3IDQuMjI4NzZDNC45MTEzNiAzLjk2ODU1IDQuNDg5NDUgMy45NjgwOCA0LjIyODc2IDQuMjI4NzZDMy45NjgwOCA0LjQ4OTQ1IDMuOTY4NTUgNC45MTEzNiA0LjIyODc2IDUuMTcxNTdMNy4wNTcxOSA4TDQuMjI4NzYgMTAuODI4NEMzLjk2ODA4IDExLjA4OTEgMy45Njg1NSAxMS41MTEgNC4yMjg3NiAxMS43NzEyQzQuNDg4OTggMTIuMDMxNSA0LjkxMDg5IDEyLjAzMTkgNS4xNzE1NyAxMS43NzEyTDggOC45NDI4MUwxMC44Mjg0IDExLjc3MTJDMTEuMDg4NiAxMi4wMzE1IDExLjUxMDUgMTIuMDMxOSAxMS43NzEyIDExLjc3MTJDMTIuMDMxOSAxMS41MTA2IDEyLjAzMTUgMTEuMDg4NiAxMS43NzEyIDEwLjgyODRaIiBmaWxsPSIjMTIxMjE3Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTEuNzcxMiAxMC44Mjg0TDguOTQyODEgOEwxMS43NzEyIDUuMTcxNTdDMTIuMDMxOSA0LjkxMDg5IDEyLjAzMTUgNC40ODg5OCAxMS43NzEyIDQuMjI4NzZDMTEuNTExIDMuOTY4NTUgMTEuMDg5MSAzLjk2ODA4IDEwLjgyODQgNC4yMjg3Nkw4IDcuMDU3MTlMNS4xNzE1NyA0LjIyODc2QzQuOTExMzYgMy45Njg1NSA0LjQ4OTQ1IDMuOTY4MDggNC4yMjg3NiA0LjIyODc2QzMuOTY4MDggNC40ODk0NSAzLjk2ODU1IDQuOTExMzYgNC4yMjg3NiA1LjE3MTU3TDcuMDU3MTkgOEw0LjIyODc2IDEwLjgyODRDMy45NjgwOCAxMS4wODkxIDMuOTY4NTUgMTEuNTExIDQuMjI4NzYgMTEuNzcxMkM0LjQ4ODk4IDEyLjAzMTUgNC45MTA4OSAxMi4wMzE5IDUuMTcxNTcgMTEuNzcxMkw4IDguOTQyODFMMTAuODI4NCAxMS43NzEyQzExLjA4ODYgMTIuMDMxNSAxMS41MTA1IDEyLjAzMTkgMTEuNzcxMiAxMS43NzEyQzEyLjAzMTkgMTEuNTEwNiAxMi4wMzE1IDExLjA4ODYgMTEuNzcxMiAxMC44Mjg0WiIgZmlsbD0iIzEyMTIxNyIvPgo8L2c+CjwvZz4KPC9zdmc+Cg==" alt=""></button>
-          <button class="chip is-selected" type="button" data-sort="recent" aria-pressed="true">Trending</button>
-          <button class="chip chip--outline" type="button" data-sort="copied" aria-pressed="false">Most copied</button>
+          <button class="chip is-selected" type="button" data-sort="copied" aria-pressed="true">Most copied</button>
+          <button class="chip chip--outline" type="button" data-sort="recent" aria-pressed="false">Trending</button>
           <button class="chip chip--outline" type="button" data-sort="odds" aria-pressed="false">High odds</button>
         </div>
 
@@ -1606,12 +1606,14 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
     cards.forEach(function (c) {
       var o = c.querySelector('.history-card-header__right');
       c.dataset.odds = o ? parseFloat(o.textContent) : 0;
+      var cp = c.querySelector('.counter-cta span:last-child'); c.dataset.copies = cp ? parseInt(cp.textContent, 10) : 0;
     });
     var main = document.querySelector('.chips-row:not(#chips-children)'), kids = document.getElementById('chips-children'),
         chips = main.querySelectorAll('.chip'), kidChips = kids.querySelectorAll('[data-sort]'), current = null, sort = 'recent';
     function render() {
       cards.sort(function (a, b) {
         if (current === 'most-copied' && sort === 'odds') return b.dataset.odds - a.dataset.odds || a.dataset.min - b.dataset.min;
+        if (current === 'most-copied' && sort === 'copied') return b.dataset.copies - a.dataset.copies || a.dataset.min - b.dataset.min;
         return a.dataset.min - b.dataset.min;
       }).forEach(function (c) { feed.appendChild(c); });
       cards.forEach(function (c) { c.hidden = !!current && current !== 'recent' && (' ' + c.dataset.tags + ' ').indexOf(' ' + current + ' ') < 0; });
@@ -1622,7 +1624,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
         var on = k.dataset.sort === sort; k.classList.toggle('is-selected', on); k.classList.toggle('chip--outline', !on); k.setAttribute('aria-pressed', on);
       });
     }
-    chips.forEach(function (ch) { ch.addEventListener('click', function () { current = current === ch.dataset.filter ? null : ch.dataset.filter; sort = 'recent'; render(); }); });
+    chips.forEach(function (ch) { ch.addEventListener('click', function () { current = current === ch.dataset.filter ? null : ch.dataset.filter; sort = current === 'most-copied' ? 'copied' : 'recent'; render(); }); });
     kidChips.forEach(function (k) { k.addEventListener('click', function () { sort = k.dataset.sort; render(); }); });
     document.getElementById('chips-clear').addEventListener('click', function () { current = null; sort = 'recent'; render(); });
     render();
