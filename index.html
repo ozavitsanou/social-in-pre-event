@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Event details | Aston Villa v Juventus FC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -642,6 +642,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .chip--icon img { width: 16px; height: 16px; display: block; }
 .chip--outline { background: transparent; border-color: var(--sem-color-border-off-gray-pale); }
 .chip.is-selected { background: var(--sem-color-bg-gray-soft-default); border-color: var(--sem-color-border-gray-pale); }
+@media (pointer: coarse) { .message-bar__input { font-size: 16px; } }
 </style>
 </head>
 <body>
@@ -1579,6 +1580,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
     function open() { screen.classList.add('kb-open'); kb.setAttribute('aria-hidden', 'false'); }
     function close() { screen.classList.remove('kb-open'); kb.setAttribute('aria-hidden', 'true'); input.blur(); }
     function setCaps(on) { caps = on; kb.classList.toggle('is-caps', on); }
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) input.readOnly = true; // phones: show only the on-screen keyboard
     input.addEventListener('focus', open);
     input.addEventListener('click', open);
     kb.addEventListener('mousedown', function (e) { e.preventDefault(); });
