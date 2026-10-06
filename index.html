@@ -425,6 +425,8 @@ html.bs-open { overflow: hidden; }
 .selections { display: flex; gap: 8px; align-items: center; justify-content: center; }
 .selections > * { flex: 1 0 0; min-width: 0; }
 .selection { height: 36px; min-height: 36px; max-height: 36px; min-width: 48px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 10px 8px; background: var(--sem-color-bg-off-gray-subtle-default); border: 1px solid var(--sem-color-border-off-gray-pale); border-radius: 8px; overflow: hidden; }
+.selection.is-selected { background: var(--sem-color-bg-primary-default); border-color: var(--sem-color-bg-primary-default); }
+.selection.is-selected .selection__label, .selection.is-selected .selection__odd { color: var(--sem-color-text-absolute-white, #fff); }
 .selection__label { flex: 1 0 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; color: var(--sem-color-text-gray-emphasis); }
 .selection__odd { color: var(--sem-color-text-highlight); text-align: right; white-space: nowrap; font: 700 14px/16px var(--global-typography-font-family-ubuntu); }
 .selection__old { color: var(--sem-color-text-disabled); text-align: right; white-space: nowrap; font: 400 14px/16px var(--global-typography-font-family-ubuntu); }
@@ -1915,6 +1917,26 @@ html.bs-open { overflow: hidden; }
     });
   })();
 
+  // Markets: tap a selection -> betslip + mini fab (tap again removes it)
+  (function () {
+    var fab = document.getElementById('mini-fab');
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('.selection'); if (!b || !b.closest('.market-card, .acca-card')) return;
+      var acca = b.closest('.acca-card'), card = acca || b.closest('.market-card'), market, label, odd = (b.querySelector('.selection__odd') || {}).textContent || '1.80';
+      if (acca) {
+        var st = acca.querySelector('.acca-card__selection-name strong, .bb-row__text strong, .acca-card__selection-name');
+        market = 'Trending ACCA'; label = st ? st.textContent : 'Selection';
+        if (!b.dataset.key) b.dataset.key = 'acca|' + Array.prototype.indexOf.call(document.querySelectorAll('.acca-card'), acca);
+      } else {
+        market = (card.querySelector('.market-name') || {}).textContent || 'Match Result';
+        label = (b.querySelector('.selection__label') || {}).textContent || 'Selection';
+        if (!b.dataset.key) b.dataset.key = market.trim() + '|' + Array.prototype.indexOf.call(card.querySelectorAll('.selection'), b);
+      }
+      if (b.classList.contains('is-selected')) { document.dispatchEvent(new CustomEvent('betslip:remove', { detail: { key: b.dataset.key } })); return; }
+      document.dispatchEvent(new CustomEvent('betslip:add', { detail: { key: b.dataset.key, label: label.trim(), market: market.trim(), odds: odd.trim() } }));
+    });
+  })();
+
   // iOS keyboard for the comment input
   (function () {
     var screen = document.querySelector('.screen'), chatInput = document.querySelector('.message-bar__input'), input = chatInput,
@@ -2137,14 +2159,26 @@ html.bs-open { overflow: hidden; }
         if (v > 0) ready = true;
       });
       bet.disabled = !ready; bet.classList.toggle('is-ready', ready);
+      document.querySelectorAll('.selection[data-key]').forEach(function (b) {
+        var on = items.some(function (x) { return x.key === b.dataset.key; }); b.classList.toggle('is-selected', on); b.setAttribute('aria-pressed', on);
+      });
       if (!n) close();
     }
     function open() { if (!items.length) return; screen.classList.add('bs-open'); document.documentElement.classList.add('bs-open'); }
     function close() { screen.classList.remove('bs-open'); document.documentElement.classList.remove('bs-open'); }
     document.addEventListener('betslip:add', function (e) {
-      var it = { id: ++uid, label: e.detail.label, market: e.detail.market, odds: e.detail.odds }; items.push(it);
+      var it = { id: ++uid, label: e.detail.label, market: e.detail.market, odds: e.detail.odds, key: e.detail.key }; items.push(it);
       list.insertAdjacentHTML('beforeend', cardHtml(it, true)); sync();
+      if (e.detail.key) totalOdds();
     });
+    document.addEventListener('betslip:remove', function (e) {
+      items = items.filter(function (x) { if (x.key !== e.detail.key) return true; var c = list.querySelector('.bs-card[data-id="' + x.id + '"]'); if (c) c.remove(); return false; });
+      sync(); totalOdds();
+    });
+    function totalOdds() {
+      var t = items.reduce(function (a, x) { return a * (num(x.odds) || 1); }, 1);
+      if (items.length) fab.querySelector('.mini-fab__odd').textContent = t.toFixed(2);
+    }
     fab.addEventListener('click', open);
     document.getElementById('bs-scrim').addEventListener('click', close);
     document.getElementById('bs-close').addEventListener('click', close);
