@@ -940,6 +940,9 @@ html.bs-open { overflow: hidden; }
 .feed > * { width: 100%; box-sizing: border-box; }
 .feed > [hidden] { display: none; }
 .chip.is-active { background: var(--sem-color-bg-off-black-pale-default); border-color: var(--sem-color-bg-off-black-pale-default); color: var(--sem-color-text-absolute-white); }
+#chips-main { gap: 8px; }
+#chips-main .chip { height: 24px; box-sizing: border-box; padding: 4px 8px; border: 1px solid var(--sem-color-border-gray-strong, #8092b3); border-radius: var(--sem-border-radius-8, 8px); background: transparent; color: var(--sem-color-text-gray-emphasis); font: 500 var(--global-typography-font-size-1-5x, 12px)/var(--global-typography-line-height-2x, 16px) 'Ubuntu', system-ui, sans-serif; }
+#chips-main .chip.is-active { background: var(--sem-color-bg-gray-emphasis-default); border-color: var(--sem-color-bg-gray-emphasis-default); color: var(--sem-color-text-gray-inverted); font-family: var(--global-typography-font-family-ubuntu-sans, 'Ubuntu Sans', system-ui, sans-serif); font-weight: 550; font-variation-settings: "wdth" 100; }
 .avatar--betano { background-image: linear-gradient(196.57771769962955deg, var(--sem-color-bg-accent-default) 0.48014%, var(--sem-color-bg-primary-default) 54.415%); }
 .avatar__betano-logo { position: absolute; inset: 15.85% 15% 13.41% 15%; display: block; }
 .avatar__betano-logo img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -1523,12 +1526,11 @@ html.bs-open { overflow: hidden; }
         </div>
 
         <div class="chips-row" id="chips-main" role="group" aria-label="Hub filters">
-          <button class="chip is-active" type="button" data-filter="all" aria-pressed="true">All</button>
-          <button class="chip" type="button" data-filter="bets" aria-pressed="false">Bets</button>
-          <button class="chip" type="button" data-filter="trending" aria-pressed="false">Trending</button>
+          <button class="chip is-active" type="button" data-filter="all" aria-pressed="true">Recent</button>
+          <button class="chip" type="button" data-filter="copied" aria-pressed="false">Most copied bets</button>
           <button class="chip" type="button" data-filter="bet-builder" aria-pressed="false">Bet Builder</button>
           <button class="chip" type="button" data-filter="analysis" aria-pressed="false">Analysis</button>
-          <button class="chip" type="button" data-filter="betano-news" aria-pressed="false">Betano news</button>
+          <button class="chip" type="button" data-filter="betano-news" aria-pressed="false">News</button>
         </div>
 
       </div>
@@ -1992,10 +1994,10 @@ html.bs-open { overflow: hidden; }
     var chips = document.querySelectorAll('#chips-main [data-filter]'), current = 'all', expanded = false;
     function render() {
       cards.sort(function (a, b) {
-        if (current === 'trending') return b.dataset.eng - a.dataset.eng || a.dataset.min - b.dataset.min;
+        if (current === 'copied') return b.dataset.eng - a.dataset.eng || a.dataset.min - b.dataset.min;
         return a.dataset.min - b.dataset.min;
       }).forEach(function (c) { feed.appendChild(c); });
-      cards.forEach(function (c) { c.hidden = (c.hasAttribute('data-extra') && !expanded) || (current !== 'all' && (' ' + c.dataset.tags + ' ').indexOf(' ' + current + ' ') < 0); });
+      cards.forEach(function (c) { c.hidden = (c.hasAttribute('data-extra') && !expanded) || (current !== 'all' && (' ' + c.dataset.tags + ' ').indexOf(' ' + (current === 'copied' ? 'bets' : current) + ' ') < 0); });
       chips.forEach(function (ch) { var on = ch.dataset.filter === current; ch.classList.toggle('is-active', on); ch.setAttribute('aria-pressed', on); });
       if (more) more.hidden = current !== 'all' || expanded;
     }
