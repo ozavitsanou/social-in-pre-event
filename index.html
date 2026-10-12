@@ -716,6 +716,9 @@ html.bs-open { overflow: hidden; }
 .screen.live-chat .lv-seg { flex: none; }
 .screen.live-chat .lv-video { flex: none; height: 150px; }
 .screen.live-chat .lv-stream { flex: none; }
+.lv-stream { overflow: hidden; }
+.screen.stream-off .lv-video, .screen.live-chat.stream-off .lv-video { height: 0; }
+.screen.stream-off .lv-ctrl { display: none; }
 @keyframes lv-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .screen.live-chat .lv-chat { animation: lv-in .3s ease both; }
 .screen.live-on:not(.live-chat) .lv-chips, .screen.live-on:not(.live-chat) .lv-cards { animation: lv-in .3s ease both; }
@@ -2380,7 +2383,7 @@ if(document.documentElement.classList.contains('gated'))setTimeout(function(){i.
     items.forEach(function (n, i) {
       n.addEventListener('click', function (e) {
         e.preventDefault();
-        if (i === 1) { screen.classList.add('live-on'); window.scrollTo(0, 0); }
+        if (i === 1) { if (!screen.classList.contains('live-on')) setStream(true); screen.classList.add('live-on'); window.scrollTo(0, 0); }
         else if (i === 2) { screen.classList.remove('live-on', 'live-chat'); window.scrollTo(0, 0); }
         else return;
         setActive(n);
@@ -2390,9 +2393,19 @@ if(document.documentElement.classList.contains('gated'))setTimeout(function(){i.
     var src = document.querySelector('.chat-section .chat-list'), dst = document.getElementById('lv-chat-list'), sc = document.getElementById('lv-chat');
     if (src && dst) dst.innerHTML = src.innerHTML;
     function toBottom() { setTimeout(function () { sc.scrollTop = sc.scrollHeight; }, 30); }
+    // Stream window: collapsed when Live first opens, opens by itself with Chat; the Stream button mirrors it
+    function setStream(off) {
+      var seg = document.querySelector('.lv-seg'), sb = seg && seg.firstElementChild;
+      screen.classList.toggle('stream-off', off);
+      if (stream) { clearTimeout(ctrlTimer); stream.classList.remove('show-ctrl'); }
+      if (!sb) return;
+      seg.querySelectorAll(':scope > .is-active').forEach(function (b) { b.classList.remove('is-active'); });
+      if (!off) sb.classList.add('is-active');
+      sb.setAttribute('aria-expanded', !off);
+    }
     // Switch to / from Chat without a jump: glide the page to the top first, then swap with the chat already at the latest message
     function setChat(on) {
-      function apply() { screen.classList.toggle('live-chat', on); if (on) { sc.scrollTop = sc.scrollHeight; requestAnimationFrame(function () { sc.scrollTop = sc.scrollHeight; }); } }
+      function apply() { screen.classList.toggle('live-chat', on); if (on) { setStream(false); sc.scrollTop = sc.scrollHeight; requestAnimationFrame(function () { sc.scrollTop = sc.scrollHeight; }); } }
       if (on && window.scrollY > 2) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         var t0 = Date.now(); (function wait() { if (window.scrollY <= 1 || Date.now() - t0 > 500) apply(); else requestAnimationFrame(wait); })();
@@ -2410,6 +2423,11 @@ if(document.documentElement.classList.contains('gated'))setTimeout(function(){i.
     });
     lv.addEventListener('click', function (e) {
       var o = e.target.closest('.lv-odd'); if (o) { o.classList.toggle('is-on'); return; }
+      var sb = e.target.closest('.lv-seg button');
+      if (sb && sb === sb.parentElement.firstElementChild) { // Stream button: collapse / expand the stream window
+        setStream(sb.classList.contains('is-active'));
+        return;
+      }
       var tb = e.target.closest('.lv-tabs button');
       if (tb && tb.dataset.lv) setChat(tb.dataset.lv === 'chat');
       var t = e.target.closest('.lv-tabs button, .lv-seg button, .lv-chip'); if (!t) return;
