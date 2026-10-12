@@ -706,7 +706,7 @@ html.bs-open { overflow: hidden; }
 .screen.live-chat .live-view { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; padding-bottom: 0; }
 .screen.live-chat .lv-only-markets { display: none !important; }
 .screen.live-chat .lv-video { flex: none; height: 150px; }
-.screen.live-chat .lv-tabs { flex: none; margin-bottom: 8px; }
+.screen.live-chat .lv-tabs { flex: none; margin: 8px 0; }
 .screen.live-chat .lv-chat { display: block; flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 8px 8px; scrollbar-width: none;
   --sem-color-bg-container-low-default: #212536; --sem-color-border-container-low: #343f56; --sem-color-bg-container-lowest-default: #171b29; --sem-color-border-container-lowest: #343f56;
   --sem-color-fg-gray-strong: #fff; --sem-color-text-gray-emphasis: #fff; --sem-color-text-gray-strong: #fff; --sem-color-text-gray-soft: #d6dbec; --sem-color-text-gray-subtle: #c0c6dc; --colors-neutrals-n-48---slate: #c0c6dc; color: #fff; }
@@ -2373,6 +2373,14 @@ if(document.documentElement.classList.contains('gated'))setTimeout(function(){i.
     var src = document.querySelector('.chat-section .chat-list'), dst = document.getElementById('lv-chat-list'), sc = document.getElementById('lv-chat');
     if (src && dst) dst.innerHTML = src.innerHTML;
     function toBottom() { setTimeout(function () { sc.scrollTop = sc.scrollHeight; }, 30); }
+    // In Chat the tabs live at the top of the scrolling chat (stream stays pinned); elsewhere they sit under the stream
+    var tabs = lv.querySelector('.lv-tabs'), video = lv.querySelector('.lv-video');
+    function placeTabs() {
+      var chat = screen.classList.contains('live-chat');
+      if (chat && tabs.parentNode !== sc) sc.insertBefore(tabs, sc.firstChild);
+      else if (!chat && tabs.parentNode === sc) video.insertAdjacentElement('afterend', tabs);
+    }
+    new MutationObserver(placeTabs).observe(screen, { attributes: true, attributeFilter: ['class'] });
     lv.addEventListener('click', function (e) {
       var o = e.target.closest('.lv-odd'); if (o) { o.classList.toggle('is-on'); return; }
       var tb = e.target.closest('.lv-tabs button');
